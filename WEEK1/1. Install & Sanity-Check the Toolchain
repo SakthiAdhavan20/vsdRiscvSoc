@@ -1,0 +1,80 @@
+# 🛠️ RISC-V Toolchain Setup Guide (RV32IMAC)
+
+This guide explains how to unpack the RISC-V toolchain, configure your environment, and verify that everything is working correctly.
+
+---
+
+## 📦 1. Unpack the Toolchain
+
+Open a terminal and run:
+
+```bash
+tar -xvzf riscv-toolchain-rv32imac-x86_64-ubuntu.tar.gz
+```
+
+This will extract a directory, typically named `opt` or `riscv-toolchain`, containing the toolchain files.
+
+---
+
+## 📁 2. Locate the bin/ Directory
+
+Navigate to the extracted directory:
+
+```bash
+cd path/to/extracted/folder/opt/riscv/bin
+```
+
+Replace `path/to/extracted/folder` with the actual path where the toolchain was extracted.
+
+Then list the contents:
+
+```bash
+ls
+```
+
+You should see binaries like:
+
+- `riscv32-unknown-elf-gcc`
+- `riscv32-unknown-elf-objdump`
+- `riscv32-unknown-elf-gdb`
+
+---
+
+## 🌐 3. Add Toolchain to Your PATH
+
+### 🔹 Temporary (for current terminal session):
+
+```bash
+export PATH="$PWD:$PATH"
+```
+
+### 🔹 Permanent (recommended):
+
+To make the change permanent:
+
+**For Bash users:**
+
+```bash
+echo 'export PATH="/home/sakthi/Desktop/VSD/opt/riscv/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+**For Zsh users:**
+
+```bash
+echo 'export PATH="/home/sakthi/Desktop/VSD/opt/riscv/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+```
+
+---
+
+## ✅ 4. Verify Installation
+
+Run the following commands to ensure the toolchain is working:
+
+```bash
+riscv32-unknown-elf-gcc --version
+riscv32-unknown-elf-objdump --version
+riscv32-unknown-elf-gdb --version
+```
+
