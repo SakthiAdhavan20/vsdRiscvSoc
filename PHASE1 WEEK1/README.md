@@ -613,3 +613,190 @@ int main() {
 * `0x10012000` is **4-byte aligned**, which is correct for a `uint32_t` (32-bit value).
 * Unaligned memory access can cause **hardware exceptions** on RISC-V.
 * MMIO registers must always be accessed with correctly sized and aligned operations.
+
+
+## ✅ 11. GDB: Stepping Through the ELF File
+
+Use GDB to run the program step-by-step and analyze each instruction executed on the RISC-V simulation.
+
+### 🧰 Launch GDB
+
+```bash
+riscv64-unknown-elf-gdb hello.elf
+```
+
+### 🔍 Inside GDB
+
+```gdb
+(gdb) target sim                # Use RISC-V simulator
+(gdb) load                      # Load the ELF file into memory
+(gdb) break main                # Set breakpoint at main
+(gdb) run                       # Start execution
+(gdb) stepi                     # Step one instruction
+(gdb) info registers            # Inspect all registers
+(gdb) disassemble               # View assembly instructions
+(gdb) continue                  # Continue program
+(gdb) quit                      # Exit GDB
+```
+
+Expected output:
+
+```
+Breakpoint 1, main () at hello.c:4
+4       printf("Hello, RISC-V!\n");
+```
+
+---
+
+## ✅ 12. Run RISC-V ELF using QEMU
+
+You can emulate your RISC-V bare-metal program using QEMU.
+
+### 📝 hello.c (Bare Metal)
+
+```c
+int main() {
+    while (1);  // Infinite loop
+    return 0;
+}
+```
+
+### ⚙️ Compile without standard library
+
+```bash
+riscv64-unknown-elf-gcc -march=rv32imac -mabi=ilp32 -nostdlib -o hello.elf hello.c
+```
+
+### ▶️ Run using QEMU
+
+```bash
+qemu-system-riscv32 -nographic -machine sifive_e -kernel hello.elf -bios none
+```
+
+🔸 `-nographic`: Use terminal output  
+🔸 `-machine sifive_e`: Use SiFive E-class core  
+🔸 `-bios none`: Skip built-in firmware  
+
+➡️ To exit: `Ctrl + A`, then press `x`
+
+---
+
+## ✅ 13. Optimisation Impact: -O0 vs -O2
+
+### 🔧 Code (hello.c):
+
+```c
+int add(int a, int b) {
+    int result = a + b;
+    return result;
+}
+
+int main() {
+    int sum = add(5, 10);
+    while (1);
+    return 0;
+}
+```
+
+### Compile with no optimization:
+
+```bash
+riscv64-unknown-elf-gcc -march=rv32imac -mabi=ilp32 -O0 -S -o hello_O0.s hello.c
+```
+
+### Compile with -O2 (optimized):
+
+```bash
+riscv64-unknown-elf-gcc -march=rv32imac -mabi=ilp32 -O2 -S -o hello_O2.s hello.c
+```
+
+### Compare outputs:
+
+```bash
+diff hello_O0.s hello_O2.s
+```
+
+---
+
+## ✅ 14. GCC Optimisation Effects
+
+| Feature          | `-O0`                              | `-O2`                                  |
+| ---------------- | ---------------------------------- | -------------------------------------- |
+| Function `add()` | Call with prologue/epilogue       | Inlined into `main()`                  |
+| Instructions     | More, direct mapping               | Fewer, optimized                       |
+| Dead code        | Retained                          | Removed                                |
+| Stack use        | Always created                     | Often eliminated                       |
+
+---
+
+## ✅ 15. RV32 Register Summary
+
+| Register | ABI Name | Description / Role                            |
+| -------- | -------- | --------------------------------------------- |
+| x0       | zero     | Constant 0                                    |
+| x1       | ra       | Return address                                |
+| x2       | sp       | Stack pointer                                 |
+| x10–x17  | a0–a7    | Function arguments / return values            |
+| x5–x7    | t0–t2    | Temporaries (caller-saved)                    |
+| x8–x9    | s0/fp, s1| Callee-saved                                  |
+| x18–x27  | s2–s11   | Callee-saved registers                        |
+
+---
+
+## ✅ 16. Inline Assembly Example: Reading `cycle` CSR
+
+### 🔧 Code:
+
+```c
+#include <stdint.h>
+
+int main() {
+    uint32_t cycle;
+    asm volatile ("csrr %0, cycle" : "=r"(cycle));
+    while (1);
+    return 0;
+}
+```
+
+### 🛠️ Compile with debug info:
+
+```bash
+riscv64-unknown-elf-gcc -march=rv32imac -mabi=ilp32 -O0 -g -o hello.elf hello.c
+```
+
+### 📟 Run in GDB:
+
+```bash
+riscv64-unknown-elf-gdb hello.elf
+(gdb) target sim
+(gdb) load
+(gdb) break main
+(gdb) run
+(gdb) x/w &cycle         # Check value of cycle
+(gdb) info registers     # See register mapping
+```
+
+---
+
+## ✅ 17. MMIO GPIO Toggle Using Volatile Pointers
+
+### 🔧 Code:
+
+```c
+int main() {
+    volatile uint32_t *gpio = (uint32_t *)0x10012000;
+    *gpio = 0x1;
+    while (1);
+    return 0;
+}
+```
+
+### 📘 Explanation:
+
+- `volatile`: prevents compiler from optimizing out the store.
+- `0x10012000`: is MMIO base for GPIO.
+- Ensures write is performed on real hardware.
+
+🔍 Alignment is important: `0x10012000` is 4-byte aligned for `uint32_t`.
+
+---
