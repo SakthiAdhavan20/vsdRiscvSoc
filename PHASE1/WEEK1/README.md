@@ -138,7 +138,7 @@ Here's a clean and structured **Markdown** version of your instructions with the
 
 ---
 
-##5.🛠️ Generate Assembly and Understand Function Structure
+## 5. 🛠️ Generate Assembly and Understand Function Structure
 
 This section explains how to generate the assembly (`.s`) file for a simple C program targeting RISC-V (`rv32imc`), and what the **function prologue** and **epilogue** mean.
 
@@ -201,7 +201,7 @@ These reverse the prologue steps, restoring the original state before returning.
 
 ---
 
-##🧰 Convert and Disassemble RISC-V ELF
+## 🧰 Convert and Disassemble RISC-V ELF
 
 This guide shows how to convert your compiled ELF binary into a raw hex file and disassemble it for analysis.
 
@@ -467,7 +467,7 @@ Great catch, Naren — let me now **clearly explain** the three key optimization
 
 ---
 
-###8.🧠 GCC Optimisations Explained
+### 8. 🧠 GCC Optimisations Explained
 
 #### ✅ 1. Dead-Code Elimination
 
